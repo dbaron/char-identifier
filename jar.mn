@@ -1,0 +1,4 @@
+# vim: set shiftwidth=45 tabstop=45 autoindent noexpandtab copyindent:
+char-identifier.jar:
+% content char-identifier %content/
+% locale char-identifier en-US %locale/en-US/
