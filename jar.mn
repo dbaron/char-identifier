@@ -2,3 +2,6 @@
 char-identifier.jar:
 % content char-identifier %content/
 % locale char-identifier en-US %locale/en-US/
+% overlay chrome://browser/content/browser.xul chrome://char-identifier/content/browserOverlay.xul application={ec8030f7-c20a-464f-9b0e-13a3a9e97384}
+  content/browserOverlay.xul
+  locale/en-US/browserOverlay.dtd
