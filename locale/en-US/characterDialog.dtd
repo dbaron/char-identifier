@@ -37,4 +37,5 @@
 <!ENTITY characterDialog.title "Character Identifier">
 <!ENTITY characterDialog.explanation "The following characters were selected:">
 <!ENTITY characterDialog.charstree.columnLabel.char "Char">
+<!ENTITY characterDialog.charstree.columnLabel.unicode "Unicode">
 <!ENTITY characterDialog.charstree.columnLabel.description "Description">

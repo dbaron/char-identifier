@@ -58,6 +58,9 @@
 			<treecol id="chars:char"
 			         label="&characterDialog.charstree.columnLabel.char;" />
 			<splitter class="tree-splitter" />
+			<treecol id="chars:unicode"
+			         label="&characterDialog.charstree.columnLabel.unicode;" />
+			<splitter class="tree-splitter" />
 			<treecol flex="1" id="chars:description" crop="center"
 			         label="&characterDialog.charstree.columnLabel.description;" />
 		</treecols>
