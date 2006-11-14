@@ -53,25 +53,14 @@
 
 	<description id="desc">&characterDialog.explanation;</description>
 
-	<!--
 	<tree id="chars-tree" flex="1" style="height: 10em; width: 30em">
 		<treecols>
-			<treecol primary="true" flex="2" id="chars:name"
-			         label="&characterDialog.charstree.columnLabel.name;" />
+			<treecol id="chars:char"
+			         label="&characterDialog.charstree.columnLabel.char;" />
 			<splitter class="tree-splitter" />
-			<treecol flex="3" id="chars:filename" crop="center"
-			         label="&characterDialog.charstree.columnLabel.filename;" />
-			<splitter class="tree-splitter" />
-			<treecol style="width: 3em" id="chars:linestart"
-			         label="&characterDialog.charstree.columnLabel.linestart;" />
-			<splitter class="tree-splitter" />
-			<treecol style="width: 3em" id="chars:lineend"
-			         label="&characterDialog.charstree.columnLabel.lineend;" />
-			<splitter class="tree-splitter" />
-			<treecol flex="2" id="chars:string"
-			         label="&characterDialog.charstree.columnLabel.string;" />
+			<treecol flex="1" id="chars:description" crop="center"
+			         label="&characterDialog.charstree.columnLabel.description;" />
 		</treecols>
 		<treechildren id="chars-body" />
 	</tree>
-	-->
 </dialog>
