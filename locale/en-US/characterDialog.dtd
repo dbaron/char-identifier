@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!-- vim: set shiftwidth=4 tabstop=4 autoindent noexpandtab: -->
+<!-- vim: set shiftwidth=8 tabstop=8 autoindent noexpandtab: -->
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Version: MPL 1.1/GPL 2.0/LGPL 2.1
    -
@@ -20,7 +19,7 @@
    - the Initial Developer. All Rights Reserved.
    -
    - Contributor(s):
-   -   L. David Baron <dbaron@dbaron.org>, Mozilla Corporation (original author)
+   -   L. David Baron <dbaron@dbaron.org> (original author)
    -
    - Alternatively, the contents of this file may be used under the terms of
    - either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -35,49 +34,5 @@
    - the terms of any one of the MPL, the GPL or the LGPL.
    -
    - ***** END LICENSE BLOCK ***** -->
-
-<!DOCTYPE overlay SYSTEM "chrome://char-identifier/locale/browserOverlay.dtd">
-
-<overlay id="charIdentOverlay"
-         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-	<script type="application/javascript"><![CDATA[
-
-	// Scope everything to avoid names leaking.
-	(function() {
-
-		window.addEventListener("load", overlayLoad, true);
-
-		function overlayLoad() {
-			var popup = document.getElementById("contentAreaContextMenu");
-			popup.addEventListener("popupshowing", menuShowing, false);
-		}
-
-		function menuShowing() {
-			// XXX Do we know that this handler happens after the
-			// onpopupshowing attribute?
-			var cm = gContextMenu;
-			var showItem = cm.isTextSelected;
-			document.getElementById("charIdentLaunch").hidden = !showItem;
-		}
-
-		function launch() {
-			var selection = document.commandDispatcher.focusedWindow.getSelection().toString();
-			var ss = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
-			ss.data = selection;
-			var ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"].getService(Components.interfaces.nsIWindowWatcher);
-			ww.openWindow(null, "chrome://char-identifier/content/characterDialog.xul", "", "", ss);
-		}
-
-		// Things we want outside this scope.
-		window.charIdentLaunch = launch;
-	})();
-
-	]]></script>
-
-	<popup id="contentAreaContextMenu">
-		<menuitem id="charIdentLaunch" label="&charIdent.launch.label;" accesskey="&charIdent.launch.accesskey;"
-			oncommand="charIdentLaunch()" insertbefore="context-searchselect" />
-	</popup>
-
-</overlay>
+<!ENTITY characterDialog.title "Character Identifier">
+<!ENTITY characterDialog.explanation "The following characters were selected:">
