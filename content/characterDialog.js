@@ -35,9 +35,38 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+/*
+ * An array of objects with the following properties:
+ *   "char": a string containing the character
+ *   "unicode": an integer containing the unicode codepoint
+ *   "description" (optional, since lazily constructed): character description
+ */
+var gChars;
+
 function CharacterDialogOnLoad()
 {
     var string = window.arguments[0];
+    gChars = [];
+    for (var idx = 0; idx < string.length; ++idx) {
+        var length = 1;
+        var char_obj = {};
+        if ((string.charCodeAt(idx) & 0xFC00) == 0xD800 &&
+            idx + 1 < string.length &&
+            (string.charCodeAt(idx + 1) & 0xFC00) == 0xDC00) {
+            // Convert the surrogate pair.
+            char_obj.char = string.substring(idx, idx + 2);
+            var h = string.charCodeAt(idx) & 0x03FF;
+            var l = string.charCodeAt(idx + 1) & 0x03FF;
+            char_obj.unicode = 0x10000 + (h << 10) + l;
+            ++idx; // extra increment
+        } else {
+            char_obj.char = string.substring(idx, idx + 1);
+            char_obj.unicode = string.charCodeAt(idx);
+        }
+        gChars.push(char_obj);
+    }
+
+    // XXX WRITE ME
 }
 
 function CharacterDialogOnUnload()
