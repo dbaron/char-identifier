@@ -81,7 +81,8 @@ var CharIdentifierService = {
 		if (0x100000 <= aCodepoint && aCodepoint <= 0x10fffd)
 			return "<Plane 16 Private Use>";
 
-		this.ensure_main_db();
+		if (!this.ensure_main_db())
+			return "Loading...";
 		if (aCodepoint in this.mMainDB)
 			return this.mMainDB[aCodepoint];
 		return "";
@@ -92,7 +93,10 @@ var CharIdentifierService = {
 	getUnihanCharacterInfo: function(aCodepoint) {
 		var result = "<CJK Ideograph>";
 
-		this.ensure_han_db();
+		if (!this.ensure_han_db()) {
+			result += " Loading...";
+			return result;
+		}
 		var obj = this.mHanDB[aCodepoint];
 		if (obj) {
 			if ("kJapaneseKun" in obj || "kJapaneseOn" in obj) {
@@ -118,7 +122,9 @@ var CharIdentifierService = {
 	},
 
 	getHangulSyllable: function(aCodepoint) {
-		this.ensure_jamo_db();
+		if (!this.ensure_jamo_db()) {
+			return "HANGUL SYLLABLE Loading...";
+		}
 
 		// See Unicode 4.0, section 3.12.
 		// A Hangul syllable is composed of a leading consonant (L), a
@@ -146,63 +152,101 @@ var CharIdentifierService = {
 		return result;
 	},
 
+	notify_descriptions_loaded: function() {
+		var os = CC["@mozilla.org/observer-service;1"].getService(CI.nsIObserverService);
+		os.notifyObservers(this, "@dbaron.org/extensions/char-identifier/descriptions-loaded;1", "");
+	},
+
 	ensure_main_db: function() {
 		if (this.mMainDB)
-			return;
+			return this.mMainDB.loaded;
 		this.mMainDB = new Array();
+		this.mMainDB.loaded = false;
 
 		var line = { value: "" };
 		var more_lines;
 
-		var unicode_db = this.read_file_in_extension("UnicodeData.txt");
-		do {
-			more_lines = unicode_db.readLine(line);
+		var lis = this.read_file_in_extension("UnicodeData.txt");
+		var timer = CC["@mozilla.org/timer;1"].createInstance(CI.nsITimer);
+		var outer_this = this;
+		var timer_callback = {
+			notify: function() {
+				var count = 5000; // lines at a time
+				do {
+					more_lines = lis.readLine(line);
 
-			var fields = line.value.split(";");
-			var codepoint = parseInt(fields[0], 16);
-			var description = fields[1];
-			if (fields[10] != "")
-				description += " (" + fields[10] + ")";
-			this.mMainDB[codepoint] = description;
-		} while (more_lines);
+					var fields = line.value.split(";");
+					var codepoint = parseInt(fields[0], 16);
+					var description = fields[1];
+					if (fields[10] != "")
+						description += " (" + fields[10] + ")";
+					outer_this.mMainDB[codepoint] = description;
+				} while (more_lines && --count > 0);
 
+				if (!more_lines) {
+					timer.cancel();
+					timer = null;
+					outer_this.mMainDB.loaded = true;
+					outer_this.notify_descriptions_loaded();
+				}
+			}
+		};
+		timer.initWithCallback(timer_callback, 0, CI.nsITimer.TYPE_REPEATING_SLACK);
+		return false;
 	},
 
 	ensure_han_db: function() {
 		if (this.mHanDB)
-			return;
+			return this.mHanDB.loaded;
 		this.mHanDB = new Array();
+		this.mHanDB.loaded = false;
 
 		var line = { value: "" };
 		var more_lines;
 
-		var unihan_db = this.read_file_in_extension("Unihan.txt");
-		do {
-			more_lines = unihan_db.readLine(line);
+		var lis = this.read_file_in_extension("Unihan.txt");
+		var timer = CC["@mozilla.org/timer;1"].createInstance(CI.nsITimer);
+		var outer_this = this;
+		var timer_callback = {
+			notify: function() {
+				var count = 5000; // lines at a time
+				do {
+					more_lines = lis.readLine(line);
 
-			var fields = line.value.split("\t");
-			if (fields.length < 3)
-				continue;
-			var codepoint = parseInt(fields[0].substring(2), 16);
-			if (!(codepoint in this.mHanDB))
-				this.mHanDB[codepoint] = {};
-			var key = fields[1];
-			var value = fields[2];
-			this.mHanDB[codepoint][key] = value;
-		} while (more_lines);
+					var fields = line.value.split("\t");
+					if (fields.length < 3)
+						continue;
+					var codepoint = parseInt(fields[0].substring(2), 16);
+					if (!(codepoint in outer_this.mHanDB))
+						outer_this.mHanDB[codepoint] = {};
+					var key = fields[1];
+					var value = fields[2];
+					outer_this.mHanDB[codepoint][key] = value;
+				} while (more_lines && --count > 0);
+
+				if (!more_lines) {
+					timer.cancel();
+					timer = null;
+					outer_this.mHanDB.loaded = true;
+					outer_this.notify_descriptions_loaded();
+				}
+			}
+		};
+		timer.initWithCallback(timer_callback, 0, CI.nsITimer.TYPE_REPEATING_SLACK);
+		return false;
 	},
 
 	ensure_jamo_db: function() {
 		if (this.mJamoDB)
-			return;
+			return true;
 		this.mJamoDB = new Array();
 
 		var line = { value: "" };
 		var more_lines;
 
-		var jamo_db = this.read_file_in_extension("Jamo.txt");
+		var lis = this.read_file_in_extension("Jamo.txt");
 		do {
-			more_lines = jamo_db.readLine(line);
+			more_lines = lis.readLine(line);
 
 			var fields = line.value.match(/^([0-9A-F]+); (\w*)/);
 			if (!fields)
@@ -211,6 +255,8 @@ var CharIdentifierService = {
 			var jamo = fields[2];
 			this.mJamoDB[codepoint] = jamo;
 		} while (more_lines);
+
+		return true;
 	},
 
 	read_file_in_extension: function(aFilename) {

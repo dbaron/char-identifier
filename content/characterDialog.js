@@ -35,6 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+var gCharTree;
+
 function CharacterDialogOnLoad()
 {
 	var string = window.arguments[0];
@@ -65,6 +67,29 @@ function CharacterDialogOnLoad()
 		}
 		char_objs.push(char_obj);
 	}
+
+	gCharTree = document.getElementById("chars-tree");
+
+	// The service loads the character databases asynchronously, so we
+	// need to listen for the notification that characters have loaded.
+	var os = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+	gCharTree.charDescriptionObserver = {
+		// nsIObserver
+		observe: function(aSubject, aTopic, aData) {
+			gCharTree.treeBoxObject.invalidateColumn(gCharTree.columns.getNamedColumn("chars:description"));
+		},
+
+		// nsISupports
+		QueryInterface: function(iid) {
+			if (iid.equals(Components.interfaces.nsISupports) ||
+				iid.equals(Components.interfaces.nsIObserver))
+				return this;
+			throw Components.results.NS_ERROR_NO_INTERFACE;
+		}
+	};
+	os.addObserver(gCharTree.charDescriptionObserver, "@dbaron.org/extensions/char-identifier/descriptions-loaded;1", "");
+	os = null;
+
 
 	var gCharIdentifierService = Components.classes["@dbaron.org/extensions/char-identifier/service;1"].getService(Components.interfaces.charidentifierIService);
 
@@ -117,9 +142,11 @@ function CharacterDialogOnLoad()
 		}
 	};
 
-	document.getElementById("chars-tree").view = tree_view;
+	gCharTree.view = tree_view;
 }
 
 function CharacterDialogOnUnload()
 {
+	var os = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+	os.removeObserver(gCharTree.charDescriptionObserver, "@dbaron.org/extensions/char-identifier/descriptions-loaded;1", "");
 }
