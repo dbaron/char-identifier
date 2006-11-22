@@ -127,6 +127,9 @@ var CharIdentifierService = {
 		}
 
 		// See Unicode 4.0, section 3.12.
+		// This code is derived from pseudo-code in the Unicode
+		// specification, and therefore may be covered by the Unicode
+		// Consortium copyright in the file data/LICENSE.
 		// A Hangul syllable is composed of a leading consonant (L), a
 		// vowel (V), and a trailing consonant (T, optional).
 		const SBase = 0xAC00;
@@ -261,6 +264,7 @@ var CharIdentifierService = {
 
 	read_file_in_extension: function(aFilename) {
 		var file = gExtensionRoot.clone();
+		file.append("data");
 		file.append(aFilename);
 
 		if (!file.exists() ||

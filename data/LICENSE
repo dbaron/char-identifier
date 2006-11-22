@@ -1,8 +1,10 @@
 vim: set shiftwidth=8 tabstop=8 autoindent noexpandtab textwidth=72:
 
-The files UnicodeData.txt and Unihan.txt are part of the Unicode
-Character Database (version 5.0.0), obtained at
-http://www.unicode.org/Public/UNIDATA/ , whose license is described at
+The files UnicodeData.txt, Unihan.txt, and Jamo.txt are part of (if
+you're looking at them in the source tree) or derived from (if you're
+looking at them in the extension) the Unicode Character Database
+(version 5.0.0), obtained at http://www.unicode.org/Public/UNIDATA/ ,
+whose license is described at
 http://www.unicode.org/Public/UNIDATA/UCD.html and
 http://www.unicode.org/copyright.html .  The latter URL contains the
 following license:
