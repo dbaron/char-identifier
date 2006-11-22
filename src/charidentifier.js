@@ -47,6 +47,7 @@ const CHAR_IDENTIFIER_CID =
 var gExtensionRoot; // nsIFile
 
 var gMainDB = new Array();
+var gHanDB = new Array();
 
 var CharIdentifierService = {
 	// nsISupports implementation
@@ -93,8 +94,23 @@ var CharIdentifierService = {
 	// private
 
 	getUnihanCharacterInfo: function(aCodepoint) {
-		// XXX WRITE ME
-		return "<CJK character>";
+		var result = "<CJK Ideograph>";
+
+		var obj = gHanDB[aCodepoint];
+		if (obj) {
+			if ("kJapaneseOn" in obj)
+				result += " [ja:" + obj["kJapaneseOn"] + "]";
+			if ("kMandarin" in obj)
+				result += " [zh(M):" + obj["kMandarin"] + "]";
+			if ("kCantonese" in obj)
+				result += " [zh(C):" + obj["kCantonese"] + "]";
+			if ("kKorean" in obj)
+				result += " [ko:" + obj["kKorean"] + "]";
+			if ("kDefinition" in obj)
+				result += " (" + obj["kDefinition"] + ")";
+		}
+
+		return result;
 	},
 
 	getHangulSyllable: function(aCodepoint) {
@@ -122,8 +138,30 @@ var CharIdentifierService = {
 			gMainDB[codepoint] = description;
 		} while (more_lines);
 
-		//var unihan_db = this.read_file_in_extension("Unihan.txt");
-		// XXX read unihan_db
+		var unihan_db = this.read_file_in_extension("Unihan.txt");
+		do {
+			more_lines = unihan_db.readLine(line);
+
+			var fields = line.value.split("\t");
+			if (fields.length < 3)
+				continue;
+			var codepoint = parseInt(fields[0].substring(2), 16);
+			if (!(codepoint in gHanDB))
+				gHanDB[codepoint] = {};
+			var key = fields[1];
+			var value = fields[2];
+			switch (key) {
+				case "kCantonese":
+				case "kDefinition":
+				case "kJapaneseOn":
+				case "kKorean":
+				case "kMandarin":
+					gHanDB[codepoint][key] = value;
+					break;
+				default:
+					break;
+			}
+		} while (more_lines);
 	},
 
 	read_file_in_extension: function(aFilename) {
