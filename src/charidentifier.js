@@ -48,6 +48,7 @@ var gExtensionRoot; // nsIFile
 
 var gMainDB = new Array();
 var gHanDB = new Array();
+var gJamoDB = new Array();
 
 var CharIdentifierService = {
 	// nsISupports implementation
@@ -114,8 +115,30 @@ var CharIdentifierService = {
 	},
 
 	getHangulSyllable: function(aCodepoint) {
-		// XXX WRITE ME
-		return "<Hangul Syllable>";
+		// See Unicode 4.0, section 3.12.
+		// A Hangul syllable is composed of a leading consonant (L), a
+		// vowel (V), and a trailing consonant (T, optional).
+		const SBase = 0xAC00;
+		const LBase = 0x1100;
+		const VBase = 0x1161;
+		const TBase = 0x11A7;
+		const SCount = 11172;
+		const LCount = 19;
+		const VCount = 21;
+		const TCount = 28;
+		const NCount = VCount * TCount;
+
+		var SIndex = aCodepoint - SBase;
+		if (SIndex < 0 || SIndex >= SCount)
+			throw CR.NS_ERROR_UNEXPECTED;
+		var L = LBase + Math.floor(SIndex / NCount);
+		var V = VBase + Math.floor((SIndex % NCount) / TCount);
+		var T = TBase + SIndex % TCount;
+
+		var result = "HANGUL SYLLABLE " + gJamoDB[L] + gJamoDB[V];
+		if (T != TBase)
+			result += gJamoDB[T];
+		return result;
 	},
 
 	ensure_initialized: function() {
@@ -161,6 +184,18 @@ var CharIdentifierService = {
 				default:
 					break;
 			}
+		} while (more_lines);
+
+		var jamo_db = this.read_file_in_extension("Jamo.txt");
+		do {
+			more_lines = jamo_db.readLine(line);
+
+			var fields = line.value.match(/^([0-9A-F]+); (\w*)/);
+			if (!fields)
+				continue;
+			var codepoint = parseInt(fields[1], 16);
+			var jamo = fields[2];
+			gJamoDB[codepoint] = jamo;
 		} while (more_lines);
 	},
 

@@ -57,6 +57,7 @@ DIST_FILES	= \
 		install.rdf \
 		data/UnicodeData.txt \
 		data/Unihan.txt \
+		data/Jamo.txt \
 		$(NULL)
 
 XULAPP_DEFINES	= \
