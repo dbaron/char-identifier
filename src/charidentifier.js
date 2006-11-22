@@ -95,8 +95,15 @@ var CharIdentifierService = {
 		this.ensure_han_db();
 		var obj = this.mHanDB[aCodepoint];
 		if (obj) {
-			if ("kJapaneseOn" in obj)
-				result += " [ja:" + obj["kJapaneseOn"] + "]";
+			if ("kJapaneseKun" in obj || "kJapaneseOn" in obj) {
+				result += " [ja: ";
+				if ("kJapaneseKun" in obj)
+					result += obj["kJapaneseKun"];
+				result += " / ";
+				if ("kJapaneseOn" in obj)
+					result += obj["kJapaneseOn"];
+				result += "]";
+			}
 			if ("kMandarin" in obj)
 				result += " [zh(M):" + obj["kMandarin"] + "]";
 			if ("kCantonese" in obj)
@@ -184,6 +191,7 @@ var CharIdentifierService = {
 			switch (key) {
 				case "kCantonese":
 				case "kDefinition":
+				case "kJapaneseKun":
 				case "kJapaneseOn":
 				case "kKorean":
 				case "kMandarin":
