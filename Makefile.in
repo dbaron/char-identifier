@@ -54,6 +54,8 @@ XPI_PKGNAME	= $(MODULE)-$(EXTENSION_VERSION)
 
 DIST_FILES	= \
 		install.rdf \
+		data/UnicodeData.txt \
+		data/Unihan.txt \
 		$(NULL)
 
 XULAPP_DEFINES	= \
