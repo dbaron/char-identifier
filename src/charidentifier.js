@@ -44,8 +44,6 @@ const CHAR_IDENTIFIER_CONTRACTID =
 const CHAR_IDENTIFIER_CID =
 	Components.ID("{003080df-a8aa-421d-9180-00479e96bfdb}");
 
-var gExtensionRoot; // nsIFile
-
 var CharIdentifierService = {
 	// nsISupports implementation
 
@@ -261,7 +259,10 @@ var CharIdentifierService = {
 	},
 
 	read_file_in_extension: function(aFilename) {
-		var file = gExtensionRoot.clone();
+		// The component is a file in the components directory, so
+		// follow |parent| twice to get the root of the extension
+		// installation.
+		var file = __LOCATION__.parent.parent.clone();
 		file.append("data");
 		file.append(aFilename);
 
@@ -345,8 +346,5 @@ var CharIdentifierModule = {
 };
 
 function NSGetModule(compMgr, componentFile) {
-	// componentFile is a file in the components/ subdirectory.
-	gExtensionRoot = componentFile.parent.parent;
-
 	return CharIdentifierModule;
 }
