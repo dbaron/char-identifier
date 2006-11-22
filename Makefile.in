@@ -58,7 +58,6 @@ DIST_FILES	= \
 		$(NULL)
 
 DIST_SIMPLE_PP_FILES = \
-		data/UnicodeData.txt \
 		data/Jamo.txt \
 		$(NULL)
 
@@ -68,6 +67,7 @@ DIST_HAN_FILES	= \
 
 DIST_NO_PP_FILES = \
 		data/LICENSE \
+		data/UnicodeData.txt \
 		$(NULL)
 
 XULAPP_DEFINES	= \
@@ -79,21 +79,25 @@ XULAPP_DEFINES	= \
 
 libs:: $(DIST_SIMPLE_PP_FILES)
 	$(NSINSTALL) -D $(FINAL_TARGET)/data
-	@$(EXIT_ON_ERROR) \
+	$(EXIT_ON_ERROR) \
 	for f in $(DIST_SIMPLE_PP_FILES); do \
-		sed 's/#.*//;/^$$/d' $(srcdir)/$$f > $(FINAL_TARGET)/data/`basename $$f`; \
+		echo "# This is a MODIFIED version of a Unicode Data File.  See the file" > $(FINAL_TARGET)/$$f; \
+		echo "# LICENSE in this directory for more information." >> $(FINAL_TARGET)/$$f; \
+		sed 's/#.*//;/^$$/d' $(srcdir)/$$f >> $(FINAL_TARGET)/$$f; \
 	done
 
 libs:: $(DIST_HAN_FILES)
 	$(NSINSTALL) -D $(FINAL_TARGET)/data
-	@$(EXIT_ON_ERROR) \
+	$(EXIT_ON_ERROR) \
 	for f in $(DIST_HAN_FILES); do \
-		grep "^U+[0-9A-F]\+	k\(Cantonese\|Definition\|JapaneseKun\|JapaneseOn\|Korean\|Mandarin\)	" $(srcdir)/$$f  > $(FINAL_TARGET)/data/`basename $$f`; \
+		echo "# This is a MODIFIED version of a Unicode Data File.  See the file" > $(FINAL_TARGET)/$$f; \
+		echo "# LICENSE in this directory for more information." >> $(FINAL_TARGET)/$$f; \
+		grep "^U+[0-9A-F]\+	k\(Cantonese\|Definition\|JapaneseKun\|JapaneseOn\|Korean\|Mandarin\)	" $(srcdir)/$$f  >> $(FINAL_TARGET)/$$f; \
 	done
 
 libs:: $(DIST_NO_PP_FILES)
 	$(NSINSTALL) -D $(FINAL_TARGET)/data
-	@$(EXIT_ON_ERROR) \
+	$(EXIT_ON_ERROR) \
 	for f in $(DIST_NO_PP_FILES); do \
 		cp $(srcdir)/$$f $(FINAL_TARGET)/data/`basename $$f`; \
 	done
