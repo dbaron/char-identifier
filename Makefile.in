@@ -55,9 +55,15 @@ XPI_PKGNAME	= $(MODULE)-$(EXTENSION_VERSION)
 
 DIST_FILES	= \
 		install.rdf \
+		$(NULL)
+
+DIST_SIMPLE_PP_FILES = \
 		data/UnicodeData.txt \
-		data/Unihan.txt \
 		data/Jamo.txt \
+		$(NULL)
+
+DIST_HAN_FILES	= \
+		data/Unihan.txt \
 		$(NULL)
 
 XULAPP_DEFINES	= \
@@ -66,5 +72,17 @@ XULAPP_DEFINES	= \
 		-DMODULE=$(MODULE) \
 		-DINSTALL_EXTENSION_ID=$(INSTALL_EXTENSION_ID) \
 		$(NULL)
+
+libs:: $(DIST_SIMPLE_PP_FILES)
+	@$(EXIT_ON_ERROR) \
+	for f in $(DIST_SIMPLE_PP_FILES); do \
+		sed 's/#.*//;/^$$/d' $(srcdir)/$$f > $(FINAL_TARGET)/`basename $$f`; \
+	done
+
+libs:: $(DIST_HAN_FILES)
+	@$(EXIT_ON_ERROR) \
+	for f in $(DIST_HAN_FILES); do \
+		grep "^U+[0-9A-F]\+	k\(Cantonese\|Definition\|JapaneseKun\|JapaneseOn\|Korean\|Mandarin\)	" $(srcdir)/$$f  > $(FINAL_TARGET)/`basename $$f`; \
+	done
 
 include $(topsrcdir)/config/rules.mk

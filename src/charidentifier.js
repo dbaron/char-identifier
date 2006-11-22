@@ -188,18 +188,7 @@ var CharIdentifierService = {
 				this.mHanDB[codepoint] = {};
 			var key = fields[1];
 			var value = fields[2];
-			switch (key) {
-				case "kCantonese":
-				case "kDefinition":
-				case "kJapaneseKun":
-				case "kJapaneseOn":
-				case "kKorean":
-				case "kMandarin":
-					this.mHanDB[codepoint][key] = value;
-					break;
-				default:
-					break;
-			}
+			this.mHanDB[codepoint][key] = value;
 		} while (more_lines);
 	},
 
