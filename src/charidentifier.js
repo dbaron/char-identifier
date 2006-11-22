@@ -46,10 +46,6 @@ const CHAR_IDENTIFIER_CID =
 
 var gExtensionRoot; // nsIFile
 
-var gMainDB = new Array();
-var gHanDB = new Array();
-var gJamoDB = new Array();
-
 var CharIdentifierService = {
 	// nsISupports implementation
 
@@ -62,8 +58,6 @@ var CharIdentifierService = {
 
 	// charidentifierIService implementation
 	getCharacterInfo: function(aCodepoint) {
-		this.ensure_initialized();
-
 		// Exclude all the regions that have entries showing up in
 		//    grep ", \(First\|Last\)" ../data/UnicodeData.txt
 		if ((0x3400 <= aCodepoint && aCodepoint <= 0x4db5) ||
@@ -87,8 +81,9 @@ var CharIdentifierService = {
 		if (0x100000 <= aCodepoint && aCodepoint <= 0x10fffd)
 			return "<Plane 16 Private Use>";
 
-		if (aCodepoint in gMainDB)
-			return gMainDB[aCodepoint];
+		this.ensure_main_db();
+		if (aCodepoint in this.mMainDB)
+			return this.mMainDB[aCodepoint];
 		return "";
 	},
 
@@ -97,7 +92,8 @@ var CharIdentifierService = {
 	getUnihanCharacterInfo: function(aCodepoint) {
 		var result = "<CJK Ideograph>";
 
-		var obj = gHanDB[aCodepoint];
+		this.ensure_han_db();
+		var obj = this.mHanDB[aCodepoint];
 		if (obj) {
 			if ("kJapaneseOn" in obj)
 				result += " [ja:" + obj["kJapaneseOn"] + "]";
@@ -115,6 +111,8 @@ var CharIdentifierService = {
 	},
 
 	getHangulSyllable: function(aCodepoint) {
+		this.ensure_jamo_db();
+
 		// See Unicode 4.0, section 3.12.
 		// A Hangul syllable is composed of a leading consonant (L), a
 		// vowel (V), and a trailing consonant (T, optional).
@@ -135,16 +133,16 @@ var CharIdentifierService = {
 		var V = VBase + Math.floor((SIndex % NCount) / TCount);
 		var T = TBase + SIndex % TCount;
 
-		var result = "HANGUL SYLLABLE " + gJamoDB[L] + gJamoDB[V];
+		var result = "HANGUL SYLLABLE " + this.mJamoDB[L] + this.mJamoDB[V];
 		if (T != TBase)
-			result += gJamoDB[T];
+			result += this.mJamoDB[T];
 		return result;
 	},
 
-	ensure_initialized: function() {
-		if (this.mInitialized)
+	ensure_main_db: function() {
+		if (this.mMainDB)
 			return;
-		this.mInitialized = true;
+		this.mMainDB = new Array();
 
 		var line = { value: "" };
 		var more_lines;
@@ -158,8 +156,18 @@ var CharIdentifierService = {
 			var description = fields[1];
 			if (fields[10] != "")
 				description += " (" + fields[10] + ")";
-			gMainDB[codepoint] = description;
+			this.mMainDB[codepoint] = description;
 		} while (more_lines);
+
+	},
+
+	ensure_han_db: function() {
+		if (this.mHanDB)
+			return;
+		this.mHanDB = new Array();
+
+		var line = { value: "" };
+		var more_lines;
 
 		var unihan_db = this.read_file_in_extension("Unihan.txt");
 		do {
@@ -169,8 +177,8 @@ var CharIdentifierService = {
 			if (fields.length < 3)
 				continue;
 			var codepoint = parseInt(fields[0].substring(2), 16);
-			if (!(codepoint in gHanDB))
-				gHanDB[codepoint] = {};
+			if (!(codepoint in this.mHanDB))
+				this.mHanDB[codepoint] = {};
 			var key = fields[1];
 			var value = fields[2];
 			switch (key) {
@@ -179,12 +187,21 @@ var CharIdentifierService = {
 				case "kJapaneseOn":
 				case "kKorean":
 				case "kMandarin":
-					gHanDB[codepoint][key] = value;
+					this.mHanDB[codepoint][key] = value;
 					break;
 				default:
 					break;
 			}
 		} while (more_lines);
+	},
+
+	ensure_jamo_db: function() {
+		if (this.mJamoDB)
+			return;
+		this.mJamoDB = new Array();
+
+		var line = { value: "" };
+		var more_lines;
 
 		var jamo_db = this.read_file_in_extension("Jamo.txt");
 		do {
@@ -195,7 +212,7 @@ var CharIdentifierService = {
 				continue;
 			var codepoint = parseInt(fields[1], 16);
 			var jamo = fields[2];
-			gJamoDB[codepoint] = jamo;
+			this.mJamoDB[codepoint] = jamo;
 		} while (more_lines);
 	},
 
@@ -213,7 +230,9 @@ var CharIdentifierService = {
 		return fis.QueryInterface(CI.nsILineInputStream);
 	},
 
-	mInitialized: false
+	mMainDB: null,
+	mHanDB: null,
+	mJamoDB: null
 };
 
 function ServiceFactory(aObject) {
