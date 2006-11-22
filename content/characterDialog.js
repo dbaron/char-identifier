@@ -66,6 +66,8 @@ function CharacterDialogOnLoad()
 		char_objs.push(char_obj);
 	}
 
+	var gCharIdentifierService = Components.classes["@dbaron.org/extensions/char-identifier/service;1"].getService(Components.interfaces.charidentifierIService);
+
 	var tree_view = {
 		rowCount: char_objs.length,
 		selection: null,
@@ -91,7 +93,7 @@ function CharacterDialogOnLoad()
 			if (col.id == "chars:unicode")
 				return "U+" + char_obj.unicode.toString(16).toUpperCase();
 			if (col.id == "chars:description")
-				return ""; // XXX WRITE ME!
+				return gCharIdentifierService.getCharacterInfo(char_obj.unicode);
 			throw Components.results.NS_ERROR_UNEXPECTED;
 		},
 		setTree: function(tree) { this.treebox = tree; },

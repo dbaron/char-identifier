@@ -44,6 +44,10 @@ const CHAR_IDENTIFIER_CONTRACTID =
 const CHAR_IDENTIFIER_CID =
 	Components.ID("{003080df-a8aa-421d-9180-00479e96bfdb}");
 
+var gExtensionRoot; // nsIFile
+
+var gMainDB = new Array();
+
 var CharIdentifierService = {
 	// nsISupports implementation
 
@@ -55,6 +59,88 @@ var CharIdentifierService = {
 	},
 
 	// charidentifierIService implementation
+	getCharacterInfo: function(aCodepoint) {
+		this.ensure_initialized();
+
+		// Exclude all the regions that have entries showing up in
+		//    grep ", \(First\|Last\)" ../data/UnicodeData.txt
+		if ((0x3400 <= aCodepoint && aCodepoint <= 0x4db5) ||
+		    (0x4e00 <= aCodepoint && aCodepoint <= 0x9fbb) ||
+		    (0x20000 <= aCodepoint && aCodepoint <= 0x2a6d6))
+			return this.getUnihanCharacterInfo(aCodepoint);
+
+		if (0xac00 <= aCodepoint && aCodepoint <= 0xd7a3)
+			return this.getHangulSyllable(aCodepoint);
+
+		if (0xd800 <= aCodepoint && aCodepoint <= 0xdb7f)
+			return "<Non Private Use High Surrogate>";
+		if (0xdb80 <= aCodepoint && aCodepoint <= 0xdbff)
+			return "<Private Use High Surrogate>";
+		if (0xdc00 <= aCodepoint && aCodepoint <= 0xdfff)
+			return "<Low Surrogate>";
+		if (0xe000 <= aCodepoint && aCodepoint <= 0xf8ff)
+			return "<Private Use>";
+		if (0xf0000 <= aCodepoint && aCodepoint <= 0xffffd)
+			return "<Plane 15 Private Use>";
+		if (0x100000 <= aCodepoint && aCodepoint <= 0x10fffd)
+			return "<Plane 16 Private Use>";
+
+		if (aCodepoint in gMainDB)
+			return gMainDB[aCodepoint];
+		return "";
+	},
+
+	// private
+
+	getUnihanCharacterInfo: function(aCodepoint) {
+		// XXX WRITE ME
+		return "<CJK character>";
+	},
+
+	getHangulSyllable: function(aCodepoint) {
+		// XXX WRITE ME
+		return "<Hangul Syllable>";
+	},
+
+	ensure_initialized: function() {
+		if (this.mInitialized)
+			return;
+		this.mInitialized = true;
+
+		var line = { value: "" };
+		var more_lines;
+
+		var unicode_db = this.read_file_in_extension("UnicodeData.txt");
+		do {
+			more_lines = unicode_db.readLine(line);
+
+			var fields = line.value.split(";");
+			var codepoint = parseInt(fields[0], 16);
+			var description = fields[1];
+			if (fields[10] != "")
+				description += " (" + fields[10] + ")";
+			gMainDB[codepoint] = description;
+		} while (more_lines);
+
+		//var unihan_db = this.read_file_in_extension("Unihan.txt");
+		// XXX read unihan_db
+	},
+
+	read_file_in_extension: function(aFilename) {
+		var file = gExtensionRoot.clone();
+		file.append(aFilename);
+
+		if (!file.exists() ||
+		    !file.isFile() ||
+		    !file.isReadable())
+			throw CR.NS_ERROR_UNEXPECTED;
+		var fis = CC["@mozilla.org/network/file-input-stream;1"]
+			.createInstance(CI.nsIFileInputStream);
+		fis.init(file, -1, -1, CI.nsIFileInputStream.CLOSE_ON_EOF);
+		return fis.QueryInterface(CI.nsILineInputStream);
+	},
+
+	mInitialized: false
 };
 
 function ServiceFactory(aObject) {
@@ -121,6 +207,9 @@ var CharIdentifierModule = {
 	}
 };
 
-function NSGetModule(compMgr, fileSpec) {
+function NSGetModule(compMgr, componentFile) {
+	// componentFile is a file in the components/ subdirectory.
+	gExtensionRoot = componentFile.parent.parent;
+
 	return CharIdentifierModule;
 }
