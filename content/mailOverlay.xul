@@ -49,7 +49,7 @@
 		window.addEventListener("load", overlayLoad, true);
 
 		function overlayLoad() {
-			var popup = document.getElementById("contentAreaContextMenu");
+			var popup = document.getElementById("messagePaneContext");
 			popup.addEventListener("popupshowing", menuShowing, false);
 		}
 
@@ -75,9 +75,9 @@
 
 	]]></script>
 
-	<popup id="contentAreaContextMenu">
+	<popup id="messagePaneContext">
 		<menuitem id="charIdentLaunch" label="&charIdent.launch.label;" accesskey="&charIdent.launch.accesskey;"
-			oncommand="charIdentLaunch()" insertbefore="context-searchselect" />
+			oncommand="charIdentLaunch()" insertbefore="messagePaneContext-sep-open" />
 	</popup>
 
 </overlay>
