@@ -7,6 +7,7 @@ char-identifier.jar:
   content/browserOverlay.xul
   content/characterDialog.xul
   content/characterDialog.js
+  content/icon.png
   content/mailOverlay.xul
   locale/en-US/characterDialog.dtd
   locale/en-US/launchOverlays.dtd
