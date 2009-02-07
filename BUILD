@@ -44,8 +44,8 @@ Change directory to <objdir>/extensions/
 
 Execute the following commands (if your objdir is your srcdir, you need
 to do the first one considerably earlier!):
-	rm -rf leak-monitor ../dist/xpi-stage/char-identifier*
-	make MOZ_EXTENSIONS=leak-monitor
+	rm -rf char-identifier ../dist/xpi-stage/char-identifier*
+	make MOZ_EXTENSIONS=char-identifier
 
 You now have the xpi for that platform in
 <objdir>/dist/xpi-stage/char-identifier-<version>.xpi
