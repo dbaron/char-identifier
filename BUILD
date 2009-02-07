@@ -47,5 +47,5 @@ to do the first one considerably earlier!):
 	rm -rf char-identifier ../dist/xpi-stage/char-identifier*
 	make MOZ_EXTENSIONS=char-identifier
 
-You now have the xpi for that platform in
+You now have the xpi in
 <objdir>/dist/xpi-stage/char-identifier-<version>.xpi
