@@ -42,7 +42,7 @@ const CR = Components.results;
 const CHAR_IDENTIFIER_CONTRACTID =
 	"@dbaron.org/extensions/char-identifier/service;1";
 const CHAR_IDENTIFIER_CID =
-	Components.ID("{003080df-a8aa-421d-9180-00479e96bfdb}");
+	Components.ID("{49ba9c07-8ce2-412b-afd6-8202d7828f38}");
 
 var CharIdentifierService = {
 	// nsISupports implementation
