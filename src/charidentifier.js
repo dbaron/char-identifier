@@ -39,14 +39,21 @@ const CI = Components.interfaces;
 const CC = Components.classes;
 const CR = Components.results;
 
-const CHAR_IDENTIFIER_CONTRACTID =
-	"@dbaron.org/extensions/char-identifier/service;1";
-const CHAR_IDENTIFIER_CID =
-	Components.ID("{49ba9c07-8ce2-412b-afd6-8202d7828f38}");
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-var CharIdentifierService = {
+function CharIdentifierService() {
+	this.mMainDB = null;
+	this.mHanDB = null;
+	this.mJamoDB = null;
+}
+
+CharIdentifierService.prototype = {
+	// Data for module / factory.
+	classDescription: "char-identifier service",
+	classID: Components.ID("{49ba9c07-8ce2-412b-afd6-8202d7828f38}"),
+	contractID: "@dbaron.org/extensions/char-identifier/service;1",
+
 	// nsISupports implementation
-
 	QueryInterface: function(uuid) {
 		if (uuid.equals(CI.nsISupports) ||
 		    uuid.equals(CI.charidentifierIService))
@@ -274,77 +281,12 @@ var CharIdentifierService = {
 			.createInstance(CI.nsIFileInputStream);
 		fis.init(file, -1, -1, CI.nsIFileInputStream.CLOSE_ON_EOF);
 		return fis.QueryInterface(CI.nsILineInputStream);
-	},
-
-	mMainDB: null,
-	mHanDB: null,
-	mJamoDB: null
-};
-
-function ServiceFactory(aObject) {
-	this._mObject = aObject;
-}
-
-ServiceFactory.prototype = {
-	// nsISupports implementation
-
-	QueryInterface: function(uuid) {
-		if (uuid.equals(CI.nsISupports) || uuid.equals(CI.nsIFactory))
-			return this;
-		throw CR.NS_NOINTERFACE;
-	},
-
-	// nsIFactory implementation
-
-	createInstance: function(aOuter, iid) {
-		if (aOuter)
-			throw CR.NS_ERROR_NO_AGGREGATION;
-		return this._mObject.QueryInterface(iid);
-	},
-
-	lockFactory: function(lock) {
-	},
-
-	// private data
-	_mObject: null
-};
-
-var CharIdentifierModule = {
-	// nsISupports implementation
-
-	QueryInterface: function(uuid) {
-		if (uuid.equals(CI.nsISupports) || uuid.equals(CI.nsIModule))
-			return this;
-		throw CR.NS_NOINTERFACE;
-	},
-
-	// nsIModule implementation
-
-	getClassObject: function(aCompMgr, aClass, aIID) {
-		if (aClass.equals(CHAR_IDENTIFIER_CID))
-			return new ServiceFactory(CharIdentifierService);
-		throw CR.NS_ERROR_FACTORY_NOT_REGISTERED;
-	},
-
-	registerSelf: function(aCompMgr, aLocation, aLoaderStr, aType) {
-		var compReg = aCompMgr.QueryInterface(CI.nsIComponentRegistrar);
-		compReg.registerFactoryLocation(CHAR_IDENTIFIER_CID,
-		                                "char-identifier module",
-		                                CHAR_IDENTIFIER_CONTRACTID,
-		                                aLocation, aLoaderStr, aType);
-	},
-
-	unregisterSelf: function(aCompMgr, aLocation, aLoaderStr) {
-		var compReg = aCompMgr.QueryInterface(CI.nsIComponentRegistrar);
-		compReg.unregisterFactoryLocation(CHAR_IDENTIFIER_CID,
-		                                  aLocation);
-	},
-
-	canUnload: function(aCompMgr) {
-		return true;
 	}
 };
 
-function NSGetModule(compMgr, componentFile) {
-	return CharIdentifierModule;
-}
+var components = [ CharIdentifierService ];
+
+if (XPCOMUtils.generateNSGetFactory)
+	var NSGetFactory = XPCOMUtils.generateNSGetFactory(components);
+else
+	var NSGetModule = XPCOMUtils.generateNSGetModule(components);

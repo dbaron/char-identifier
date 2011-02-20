@@ -38,7 +38,9 @@ the terms of any one of the MPL, the GPL or the LGPL.
 Build instructions for char-identifier extension.
 
 In a source tree from the Mozilla trunk, extract the source tarball
-inside of mozilla/extensions/
+inside of mozilla/extensions/ .  (Note that you must have a source tree
+containing the Gecko 2.0 XPCOM changes to generate the necessary
+chrome.manifest .  The result will be backwards compatible.)
 
 Change directory to <objdir>/extensions/
 
