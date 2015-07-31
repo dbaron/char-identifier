@@ -62,7 +62,7 @@ DIST_SIMPLE_PP_FILES = \
 		$(NULL)
 
 DIST_HAN_FILES	= \
-		data/Unihan.txt \
+		data/Unihan_Readings.txt \
 		$(NULL)
 
 DIST_NO_PP_FILES = \

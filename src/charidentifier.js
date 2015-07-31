@@ -210,7 +210,7 @@ CharIdentifierService.prototype = {
 		var line = { value: "" };
 		var more_lines;
 
-		var lis = this.read_file_in_extension("Unihan.txt");
+		var lis = this.read_file_in_extension("Unihan_Readings.txt");
 		var timer = CC["@mozilla.org/timer;1"].createInstance(CI.nsITimer);
 		var outer_this = this;
 		var timer_callback = {
