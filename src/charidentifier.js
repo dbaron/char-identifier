@@ -266,6 +266,8 @@ CharIdentifierService.prototype = {
 	},
 
 	read_file_in_extension: function(aFilename) {
+		// NOTE: Assumes file is in UTF-8.
+		var encoding = "UTF-8";
 		// The component is a file in the components directory, so
 		// follow |parent| twice to get the root of the extension
 		// installation.
@@ -280,7 +282,10 @@ CharIdentifierService.prototype = {
 		var fis = CC["@mozilla.org/network/file-input-stream;1"]
 			.createInstance(CI.nsIFileInputStream);
 		fis.init(file, -1, -1, CI.nsIFileInputStream.CLOSE_ON_EOF);
-		return fis.QueryInterface(CI.nsILineInputStream);
+		var cis = CC["@mozilla.org/intl/converter-input-stream;1"]
+			.createInstance(CI.nsIConverterInputStream);
+		cis.init(fis, encoding, 8192, 0xFFFD);
+		return cis.QueryInterface(CI.nsIUnicharLineInputStream);
 	}
 };
 
