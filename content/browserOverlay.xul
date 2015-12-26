@@ -62,7 +62,12 @@
 		}
 
 		function launch() {
-			var selection = document.commandDispatcher.focusedWindow.getSelection().toString();
+			var selection;
+			if (gContextMenu.isRemote) {
+				selection = gContextMenuContentData.selectionInfo.text;
+			} else {
+				selection = document.commandDispatcher.focusedWindow.getSelection().toString();
+			}
 			var ss = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
 			ss.data = selection;
 			var ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"].getService(Components.interfaces.nsIWindowWatcher);
