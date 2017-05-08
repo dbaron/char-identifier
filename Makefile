@@ -37,6 +37,7 @@
 # ***** END LICENSE BLOCK *****
 
 FINAL_TARGET = output
+PACKAGE = char-identifier.zip
 srcdir = .
 
 DIST_NO_PP_FILES = \
@@ -64,7 +65,7 @@ DATA_NO_PP_FILES = \
 		$(NULL)
 
 package:: all
-	(cd output && zip -r -FS ../char-identifier.zip .)
+	(cd output && zip -r -FS ../$(PACKAGE) .)
 
 all:: $(DIST_NO_PP_FILES)
 	mkdir -p $(FINAL_TARGET)
@@ -95,4 +96,4 @@ all:: $(DATA_NO_PP_FILES)
 	done
 
 clean:
-	rm -rf $(FINAL_TARGET)
+	rm -rf $(FINAL_TARGET) $(PACKAGE)
