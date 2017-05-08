@@ -15,7 +15,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 		// FIXME: Persist the size and position of this window!
 		browser.windows.create({
 			url: [ "characterDialog.html" ],
-			width: 600,
+			width: 800,
 			height: 400,
 			type: "popup"
 		});
