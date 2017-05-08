@@ -1,0 +1,21 @@
+{
+	"applications": {
+		"gecko": {
+			"id": "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+		}
+	},
+	"author": "L. David Baron",
+	"background": {
+		"scripts": [ "background.js" ]
+	},
+	"description": "This extension adds a context menu item for selected text that provides more information (from the Unicode database) about the characters selected.",
+	"homepage_url": "https://dbaron.org/mozilla/char-identifier/",
+	"icons": {
+		"48": "icon-48.png",
+		"96": "icon-96.png"
+	},
+	"manifest_version": 2,
+	"name": "Character Identifier",
+	"permissions": [ "contextMenus" ],
+	"version": "0.2"
+}

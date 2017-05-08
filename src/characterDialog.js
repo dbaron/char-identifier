@@ -1,4 +1,4 @@
-/* vim: set shiftwidth=4 tabstop=4 autoindent cindent noexpandtab copyindent: */
+/* vim: set shiftwidth=4 tabstop=4 autoindent cindent noexpandtab: */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -12,14 +12,14 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is the char-identifier extension.
+ * The Original Code is the character identifier extension.
  *
  * The Initial Developer of the Original Code is the Mozilla Foundation.
  * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   L. David Baron <dbaron@dbaron.org> (original author)
+ *   L. David Baron <dbaron@dbaron.org>, Mozilla Corporation (original author)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -35,14 +35,61 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "nsISupports.idl"
+var gBgWin;
+var gId;
 
-[scriptable, uuid(34a79f71-653a-4f2a-995a-c11f1b32691d)]
-interface charidentifierIService : nsISupports
+function CharacterDialogOnLoad(event)
 {
-	/**
-	 * Return a string describing the character whose Unicode codepoint
-	 * is |codepoint|, based on descriptions in the Unicode database.
-	 */
-	AString getCharacterInfo(in unsigned long aCodepoint);
-};
+	if (event.target != document) {
+		return;
+	}
+
+	browser.runtime.getBackgroundPage().then((bgWin) => {
+		gBgWin = bgWin;
+		let id = bgWin.gNextWindowId++;
+		gId = id;
+		bgWin.gWindowIds[id] = window;
+		bgWin.gWorker.postMessage({operation: "register", id: id});
+	});
+}
+
+function UpdateChars(data) {
+	let tbody = document.getElementById("output");
+	let tr = output.firstChild;
+	if (output.firstChild) {
+		// Update the existing table with new descriptions.
+		for (let ch of data) {
+			tr.lastChild.firstChild.data = ch.description;
+			tr = tr.nextSibling;
+		}
+	} else {
+		// Build the table.
+		for (let ch of data) {
+			tr = document.createElement("tr");
+			function append_td(name) {
+				let textNode = document.createTextNode(ch[name]);
+				let td = document.createElement("td");
+				td.setAttribute("class", name);
+				td.appendChild(textNode);
+				tr.appendChild(td);
+			}
+			append_td("char");
+			append_td("unicode");
+			append_td("description");
+			tbody.appendChild(tr);
+		}
+	}
+}
+
+function CharacterDialogOnUnload(event)
+{
+	if (event.target != document || !gBgWin) {
+		return;
+	}
+
+	gBgWin.gWorker.postMessage({operation: "unregister", id: gId});
+	delete gBgWin.gWindowIds[gId];
+}
+
+window.addEventListener("load", CharacterDialogOnLoad);
+window.addEventListener("unload", CharacterDialogOnUnload);

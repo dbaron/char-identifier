@@ -36,23 +36,63 @@
 #
 # ***** END LICENSE BLOCK *****
 
-DEPTH		= ../../..
-topsrcdir	= @top_srcdir@
-srcdir		= @srcdir@
-VPATH		= @srcdir@
+FINAL_TARGET = output
+srcdir = .
 
-include $(DEPTH)/config/autoconf.mk
-
-MODULE		= char-identifier
-XPI_NAME	= $(MODULE)
-
-XPIDLSRCS	= \
-		charidentifierIService.idl \
+DIST_NO_PP_FILES = \
+		images/icon-48.png \
+		images/icon-96.png \
+		src/background.js \
+		src/worker.js \
+		src/manifest.json \
+		src/characterDialog.html \
+		src/characterDialog.js \
+		src/characterDialog.css \
 		$(NULL)
 
-EXTRA_COMPONENTS = \
-		charidentifier.js \
-		charidentifier.manifest \
+DATA_SIMPLE_PP_FILES = \
+		data/Jamo.txt \
 		$(NULL)
 
-include $(topsrcdir)/config/rules.mk
+DATA_HAN_FILES	= \
+		data/Unihan_Readings.txt \
+		$(NULL)
+
+DATA_NO_PP_FILES = \
+		data/LICENSE \
+		data/UnicodeData.txt \
+		$(NULL)
+
+package:: all
+	(cd output && zip -r -FS ../char-identifier.zip .)
+
+all:: $(DIST_NO_PP_FILES)
+	mkdir -p $(FINAL_TARGET)
+	for f in $(DIST_NO_PP_FILES); do \
+		cp $(srcdir)/$$f $(FINAL_TARGET)/; \
+	done
+
+all:: $(DATA_SIMPLE_PP_FILES)
+	mkdir -p $(FINAL_TARGET)/data
+	for f in $(DATA_SIMPLE_PP_FILES); do \
+		echo "# This is a MODIFIED version of a Unicode Data File.  See the file" > $(FINAL_TARGET)/$$f; \
+		echo "# LICENSE in this directory for more information." >> $(FINAL_TARGET)/$$f; \
+		sed 's/#.*//;/^$$/d' $(srcdir)/$$f >> $(FINAL_TARGET)/$$f; \
+	done
+
+all:: $(DATA_HAN_FILES)
+	mkdir -p $(FINAL_TARGET)/data
+	for f in $(DATA_HAN_FILES); do \
+		echo "# This is a MODIFIED version of a Unicode Data File.  See the file" > $(FINAL_TARGET)/$$f; \
+		echo "# LICENSE in this directory for more information." >> $(FINAL_TARGET)/$$f; \
+		grep "^U+[0-9A-F]\+	k\(Cantonese\|Definition\|JapaneseKun\|JapaneseOn\|Korean\|Mandarin\)	" $(srcdir)/$$f  >> $(FINAL_TARGET)/$$f; \
+	done
+
+all:: $(DATA_NO_PP_FILES)
+	mkdir -p $(FINAL_TARGET)/data
+	for f in $(DATA_NO_PP_FILES); do \
+		cp $(srcdir)/$$f $(FINAL_TARGET)/data/; \
+	done
+
+clean:
+	rm -rf $(FINAL_TARGET)
