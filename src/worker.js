@@ -207,6 +207,7 @@ function read_file_in_extension(aFilename) {
 	// FIXME: Do we need to force UTF-8, or does the default work?
 	return Promise.resolve( // response.text() returns a Promise (FIXME: needed?)
 		fetch("data/" + aFilename).
+		// FIXME: Use streams when available!
 		then((response) => response.text())).
 	then((text) => function* generate_lines() {
 		let gNextChar = 0;
