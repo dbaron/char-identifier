@@ -1,4 +1,8 @@
 
+if (typeof(browser) === "undefined") {
+	browser = chrome;
+}
+
 browser.contextMenus.create({
 	id: "char-identifier-identify",
 	title: "Identify Characters",

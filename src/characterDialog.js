@@ -44,13 +44,19 @@ function CharacterDialogOnLoad(event)
 		return;
 	}
 
-	browser.runtime.getBackgroundPage().then((bgWin) => {
+	let handle_backgroundPage = (bgWin) => {
 		gBgWin = bgWin;
 		let id = bgWin.gNextWindowId++;
 		gId = id;
 		bgWin.gWindowIds[id] = window;
 		bgWin.gWorker.postMessage({operation: "register", id: id});
-	});
+	};
+	if (typeof(browser) !== "undefined") {
+		browser.runtime.getBackgroundPage().then(handle_backgroundPage);
+	} else {
+		chrome.runtime.getBackgroundPage(handle_backgroundPage);
+	}
+	
 }
 
 function UpdateChars(data) {
