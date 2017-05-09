@@ -9,9 +9,9 @@ browser.contextMenus.create({
 	contexts: ["selection"]
 });
 
-// Using this rather than onclick above allows use of event pages; see
-// https://developer.chrome.com/extensions/event_pages .  But I'm not
-// using event pages yet; Firefox doesn't support them.
+// Using this rather than onclick above allows use of event pages
+// (persistent: false in the manifest); see
+// https://developer.chrome.com/extensions/event_pages .
 browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId == "char-identifier-identify") {
 		gWorker.postMessage({operation: "add_pending", string: info.selectionText});

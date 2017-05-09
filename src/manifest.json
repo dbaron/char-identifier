@@ -6,7 +6,7 @@
 	},
 	"author": "L. David Baron",
 	"background": {
-		"persistent": true,
+		"persistent": false,
 		"scripts": [ "background.js" ]
 	},
 	"description": "This extension adds a context menu item for selected text that provides more information (from the Unicode database) about the characters selected.",
