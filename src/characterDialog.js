@@ -66,16 +66,16 @@ function UpdateChars(data) {
 		// Build the table.
 		for (let ch of data) {
 			tr = document.createElement("tr");
-			function append_td(name) {
-				let textNode = document.createTextNode(ch[name]);
+			function append_td(name, text) {
+				let textNode = document.createTextNode(text);
 				let td = document.createElement("td");
 				td.setAttribute("class", name);
 				td.appendChild(textNode);
 				tr.appendChild(td);
 			}
-			append_td("char");
-			append_td("unicode");
-			append_td("description");
+			append_td("char", ch.char);
+			append_td("unicode", `U+${ch.unicode.toString(16).toUpperCase()}`);
+			append_td("description", ch.description);
 			tbody.appendChild(tr);
 		}
 	}
