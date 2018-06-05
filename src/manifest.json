@@ -18,5 +18,5 @@
 	"manifest_version": 2,
 	"name": "Character Identifier",
 	"permissions": [ "contextMenus" ],
-	"version": "0.2.1"
+	"version": "0.2.2"
 }
