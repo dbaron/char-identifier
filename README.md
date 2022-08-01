@@ -2,4 +2,4 @@
 
 It was previously (in this same repository) a Firefox extension using the old XUL-based Firefox extensions API. Because it is a Web extension, it works in both Firefox, Chrome, and Edge.
 
-Build it by running `make`.  The unpacked output will be in `output/`, and the packaged extension will be in `char-identifier.zip`.
+Build it by running `make`. The unpacked output will be in `output/`, and the packaged extension will be in `char-identifier.zip`.
